@@ -46,7 +46,7 @@ public class AnimalApp {
                 do {
                     System.out.print("Введите возраст животного: ");
                     while (!scanner.hasNextInt()) {
-                        System.out.println("Введите число!");
+                        System.out.println("Введите целое число!");
                         scanner.next();
                     }
                     age = scanner.nextInt();
@@ -62,7 +62,7 @@ public class AnimalApp {
                 do {
                     System.out.print("Введите вес животного: ");
                     while (!scanner.hasNextInt()) {
-                        System.out.println("Введите число!");
+                        System.out.println("Введите целое число!");
                         scanner.next();
                     }
                     weight = scanner.nextInt();
