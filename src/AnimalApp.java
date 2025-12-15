@@ -42,21 +42,37 @@ public class AnimalApp {
                 System.out.print("Введите имя животного: ");
                 animal.setName(scanner.next());
 
-                System.out.print("Введите возраст животного: ");
-                while (!scanner.hasNextInt()) {
-                    System.out.println("Введите число!");
-                    scanner.next();
-                }
-                animal.setAge(scanner.nextInt());
-                scanner.nextLine();
+                int age;
+                do {
+                    System.out.print("Введите возраст животного: ");
+                    while (!scanner.hasNextInt()) {
+                        System.out.println("Введите число!");
+                        scanner.next();
+                    }
+                    age = scanner.nextInt();
+                    scanner.nextLine();
+                    if (age <=0) {
+                        System.out.println("Значение возраста должно быть положительным!");
+                    }
+                } while (age <= 0);
 
-                System.out.print("Введите вес животного: ");
-                while (!scanner.hasNextInt()) {
-                    System.out.println("Введите число!");
-                    scanner.next();
-                }
-                animal.setWeight(scanner.nextInt());
-                scanner.nextLine();
+                animal.setAge(age);
+
+                int weight;
+                do {
+                    System.out.print("Введите вес животного: ");
+                    while (!scanner.hasNextInt()) {
+                        System.out.println("Введите число!");
+                        scanner.next();
+                    }
+                    weight = scanner.nextInt();
+                    scanner.nextLine();
+                    if (weight <= 0) {
+                        System.out.println("Значение веса должно быть положительным!");
+                    }
+                } while (weight <= 0);
+
+                animal.setWeight(weight);
 
                 System.out.print("Введите цвет (BLACK/WHITE): ");
                 String colorInput = scanner.nextLine().trim().toUpperCase();
