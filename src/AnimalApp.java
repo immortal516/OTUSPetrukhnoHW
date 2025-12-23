@@ -116,16 +116,41 @@ public class AnimalApp {
                     continue;
                 }
 
+                System.out.print("Введите новый тип (CAT/DOG/DUCK, или Enter, чтобы оставить прежний): ");
+                String typeInput = scanner.nextLine().trim().toUpperCase();
+                if (!typeInput.isEmpty()) {
+                    try {
+                        AnimalType newType = AnimalType.valueOf(typeInput);
+                        Animal newAnimal = animalFactory.create(newType);
+                        newAnimal.setId(animal.getId());
+                        newAnimal.setName(animal.getName());
+                        newAnimal.setAge(animal.getAge());
+                        newAnimal.setWeight(animal.getWeight());
+                        newAnimal.setColor(animal.getColor());
+                        animal = newAnimal;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Неверный тип, оставлен прежний.");
+                    }
+                }
+
                 System.out.print("Введите новое имя (или Enter, чтобы оставить прежнее): ");
                 String name = scanner.nextLine();
                 if (!name.isEmpty()) animal.setName(name);
 
                 System.out.print("Введите новый возраст (или 0, чтобы оставить прежний): ");
+                while (!scanner.hasNextInt()) {
+                    System.out.println("Введите целое число!");
+                    scanner.next();
+                }
                 int age = scanner.nextInt();
                 scanner.nextLine();
                 if (age > 0) animal.setAge(age);
 
                 System.out.print("Введите новый вес (или 0, чтобы оставить прежний): ");
+                while (!scanner.hasNextInt()) {
+                    System.out.println("Введите целое число!");
+                    scanner.next();
+                }
                 int weight = scanner.nextInt();
                 scanner.nextLine();
                 if (weight > 0) animal.setWeight(weight);
@@ -141,7 +166,7 @@ public class AnimalApp {
                 }
 
                 animalDao.update(animal);
-                System.out.println("Животное обновлено.");
+                System.out.println("Данные по животному " + animal.getName() + " успешно обновлены.");
             }
         }
     }
