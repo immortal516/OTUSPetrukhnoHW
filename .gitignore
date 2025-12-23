@@ -4,3 +4,6 @@
 
 # Build output
 out/
+
+#Maven target
+/target

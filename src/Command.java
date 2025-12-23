@@ -5,6 +5,8 @@ public enum Command {
 
     ADD,
     LIST,
+    EDIT,
+    FILTER,
     EXIT;
 
     public static List<String> NAMES = collectNames();

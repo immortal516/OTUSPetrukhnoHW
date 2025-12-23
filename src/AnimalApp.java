@@ -1,16 +1,23 @@
 import animals.Animal;
 import animals.Color;
+import dao.AnimalDao;
+import dao.AnimalDaoImpl;
 import factory.AnimalFactory;
 import factory.AnimalType;
+import utils.AnimalTable;
+import utils.ConnectionManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class AnimalApp {
-
     public static void main(String[] args) {
-        List<Animal> animals = new ArrayList<>();
+        try (ConnectionManager cm = new ConnectionManager()) {
+            AnimalTable animalTable = new AnimalTable(cm);
+            animalTable.create();
+        }
+
+        AnimalDao animalDao = new AnimalDaoImpl();
         AnimalFactory animalFactory = new AnimalFactory();
 
         Scanner scanner = new Scanner(System.in);
@@ -19,15 +26,15 @@ public class AnimalApp {
         while (currentCommand != Command.EXIT) {
             currentCommand = getCommand(scanner);
             if (currentCommand == Command.LIST) {
+                List<Animal> animals = animalDao.findAll();
                 if (animals.isEmpty()) {
                     System.out.println("Список пуст");
                 }
                 for (Animal animal : animals) {
-                    System.out.println(animal);
+                    System.out.println("[" + animal.getId() + "] " + animal);
                 }
             } else if (currentCommand == Command.ADD) {
                 AnimalType animalType = null;
-
                 while (animalType == null) {
                     System.out.print("Какое животное добавить? (cat/dog/duck): ");
                     String typeInput = scanner.next().trim().toUpperCase();
@@ -51,7 +58,7 @@ public class AnimalApp {
                     }
                     age = scanner.nextInt();
                     scanner.nextLine();
-                    if (age <=0) {
+                    if (age <= 0) {
                         System.out.println("Значение возраста должно быть положительным!");
                     }
                 } while (age <= 0);
@@ -82,8 +89,59 @@ public class AnimalApp {
                     System.out.println("Неверный цвет, установлен по умолчанию.");
                     animal.setColor(null);
                 }
-                animals.add(animal);
+                animalDao.save(animal);
                 animal.say();
+            } else if (currentCommand == Command.FILTER) {
+                System.out.print("Введите тип животного для фильтрации (CAT/DOG/DUCK): ");
+                String type = scanner.next().trim().toUpperCase();
+                List<Animal> animals = animalDao.findByType(type);
+                if (animals.isEmpty()) {
+                    System.out.println("Список пуст");
+                }
+                for (Animal animal : animals) {
+                    System.out.println("[" + animal.getId() + "] " + animal);
+                }
+            } else if (currentCommand == Command.EDIT) {
+                System.out.print("Укажите id животного, которое хотите отредактировать: ");
+                while (!scanner.hasNextInt()) {
+                    System.out.println("Введите целое число!");
+                    scanner.next();
+                }
+                int id = scanner.nextInt();
+                scanner.nextLine();
+
+                Animal animal = animalDao.findById(id);
+                if (animal == null) {
+                    System.out.println("Животное с таким id не найдено.");
+                    continue;
+                }
+
+                System.out.print("Введите новое имя (или Enter, чтобы оставить прежнее): ");
+                String name = scanner.nextLine();
+                if (!name.isEmpty()) animal.setName(name);
+
+                System.out.print("Введите новый возраст (или 0, чтобы оставить прежний): ");
+                int age = scanner.nextInt();
+                scanner.nextLine();
+                if (age > 0) animal.setAge(age);
+
+                System.out.print("Введите новый вес (или 0, чтобы оставить прежний): ");
+                int weight = scanner.nextInt();
+                scanner.nextLine();
+                if (weight > 0) animal.setWeight(weight);
+
+                System.out.print("Введите новый цвет (BLACK/WHITE, или Enter, чтобы оставить прежний): ");
+                String colorInput = scanner.nextLine().trim().toUpperCase();
+                if (!colorInput.isEmpty()) {
+                    try {
+                        animal.setColor(Color.valueOf(colorInput));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Неверный цвет, оставлен прежний.");
+                    }
+                }
+
+                animalDao.update(animal);
+                System.out.println("Животное обновлено.");
             }
         }
     }
