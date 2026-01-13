@@ -1,8 +1,12 @@
 package utils;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ConnectionManager implements AutoCloseable {
+    private static volatile ConnectionManager instance;
 
     private final String connection_url = System.getenv("url");
     private final String login = System.getenv("login");
@@ -11,13 +15,20 @@ public class ConnectionManager implements AutoCloseable {
     private Connection connection;
     private Statement statement;
 
-    public ConnectionManager() {
+    private ConnectionManager() {
         try {
             connection = DriverManager.getConnection(connection_url, login, password);
             statement = connection.createStatement();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static ConnectionManager getInstance() {
+        if (instance == null) {
+            instance = new ConnectionManager();
+        }
+        return instance;
     }
 
     public void executeUpdate(String query) {
@@ -28,6 +39,7 @@ public class ConnectionManager implements AutoCloseable {
         }
     }
 
+    @Override
     public void close() {
         try {
             if (statement != null && !statement.isClosed()) statement.close();

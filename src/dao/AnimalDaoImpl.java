@@ -12,11 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AnimalDaoImpl implements AnimalDao {
+    private final ConnectionManager cm;
+
+    public AnimalDaoImpl(ConnectionManager cm) {
+        this.cm = cm;
+    }
+
     @Override
     public void save(Animal animal) {
         String sql = "INSERT INTO animals_otus_petrukhno (name, age, weight, color, type) VALUES (?, ?, ?, ?, ?)";
-        try (ConnectionManager cm = new ConnectionManager();
-             PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
             ps.setString(1, animal.getName());
             ps.setInt(2, animal.getAge());
             ps.setInt(3, animal.getWeight());
@@ -32,8 +37,7 @@ public class AnimalDaoImpl implements AnimalDao {
     public List<Animal> findAll() {
         List<Animal> animals = new ArrayList<>();
         String sql = "SELECT * FROM animals_otus_petrukhno ORDER BY id ASC ";
-        try (ConnectionManager cm = new ConnectionManager();
-             Statement stmt = cm.getConnection().createStatement();
+        try (Statement stmt = cm.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -64,8 +68,7 @@ public class AnimalDaoImpl implements AnimalDao {
     @Override
     public void update(Animal animal) {
         String sql = "UPDATE animals_otus_petrukhno SET name = ?, age = ?, weight = ?, color = ?, type = ? WHERE id = ?";
-        try (ConnectionManager cm = new ConnectionManager();
-             PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
             ps.setString(1, animal.getName());
             ps.setInt(2, animal.getAge());
             ps.setInt(3, animal.getWeight());
@@ -78,13 +81,11 @@ public class AnimalDaoImpl implements AnimalDao {
         }
     }
 
-
     @Override
     public List<Animal> findByType(String type) {
         List<Animal> animals = new ArrayList<>();
         String sql = "SELECT * FROM animals_otus_petrukhno WHERE type = ? ORDER BY id ASC";
-        try (ConnectionManager cm = new ConnectionManager();
-             PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
             ps.setString(1, type.toUpperCase());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -115,8 +116,7 @@ public class AnimalDaoImpl implements AnimalDao {
     @Override
     public Animal findById(int id) {
         String sql = "SELECT * FROM animals_otus_petrukhno WHERE id = ?";
-        try (ConnectionManager cm = new ConnectionManager();
-             PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cm.getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

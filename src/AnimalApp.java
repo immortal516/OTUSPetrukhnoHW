@@ -12,12 +12,12 @@ import java.util.Scanner;
 
 public class AnimalApp {
     public static void main(String[] args) {
-        try (ConnectionManager cm = new ConnectionManager()) {
-            AnimalTable animalTable = new AnimalTable(cm);
-            animalTable.create();
-        }
+        ConnectionManager cm = ConnectionManager.getInstance();
 
-        AnimalDao animalDao = new AnimalDaoImpl();
+        AnimalTable animalTable = new AnimalTable(cm);
+        animalTable.create();
+
+        AnimalDao animalDao = new AnimalDaoImpl(cm);
         AnimalFactory animalFactory = new AnimalFactory();
 
         Scanner scanner = new Scanner(System.in);
@@ -169,6 +169,7 @@ public class AnimalApp {
                 System.out.println("Данные по животному " + animal.getName() + " успешно обновлены.");
             }
         }
+        cm.close();
     }
 
     private static Command getCommand(Scanner scanner) {
